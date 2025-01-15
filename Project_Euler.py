@@ -584,11 +584,176 @@ def pe_20(n):
             carry = carry//10
     return(np.sum(digits))
 
+def pe_21(n):
+    primes = pehelperfunctions.gen_primes(n+1)
+    n_p = len(primes)
+    div_sum = np.zeros(n,dtype = int)
+    divisors = np.zeros(n_p,dtype = int)
+    for i in range(2,n+1):
+        cand = i
+        prime_index = 0
+        while cand != 1:
+            prime = primes[prime_index]
+            while cand%prime == 0:
+                cand = cand//prime
+                divisors[prime_index] = divisors[prime_index] + 1
+            prime_index = prime_index + 1
+        pos_index = np.where(divisors>0)
+        divisors_pos = divisors[pos_index]
+        prime_key = primes[pos_index]
+        div_sum[i-1] = pehelperfunctions.divisor_sum(divisors_pos,prime_key,i)
+        divisors[:prime_index] = np.zeros(prime_index,dtype = int)
+    amic_sum = 0
+    for i in range(2,n+1):
+        i_sum = div_sum[i-1]
+        if i_sum - 1 < n:
+            amic_can = div_sum[i_sum-1]
+            if amic_can == i and i < i_sum:
+                amic_sum = amic_sum + i + i_sum
+    return(amic_sum)
+
+def pe_23():
+    n = 28123
+    primes = pehelperfunctions.gen_primes(n+1)
+    n_p = len(primes)
+    div_sum = np.zeros(n,dtype = int)
+    divisors = np.zeros(n_p,dtype = int)
+    for i in range(2,n+1):
+        cand = i
+        prime_index = 0
+        while cand != 1:
+            prime = primes[prime_index]
+            while cand%prime == 0:
+                cand = cand//prime
+                divisors[prime_index] = divisors[prime_index] + 1
+            prime_index = prime_index + 1
+        pos_index = np.where(divisors>0)
+        divisors_pos = divisors[pos_index]
+        prime_key = primes[pos_index]
+        div_sum[i-1] = pehelperfunctions.divisor_sum(divisors_pos,prime_key,i)
+        divisors[:prime_index] = np.zeros(prime_index,dtype = int)
+    abun_index = np.where((div_sum-np.arange(1,n+1))>0)
+    abun = np.arange(1,n+1)[abun_index]
+    abun_sum = np.arange(1,n+1)
+    for i in abun:
+        for j in abun:
+            if i + j <= n:
+                abun_sum[i+j-1] = 0
+    return(np.sum(abun_sum))
+
+def pe_24(n,m):
+    #only works for small n and m
+    perm = np.zeros(m,dtype = int)
+    rank_rem = n-1
+    nums = np.arange(m)
+    for i in range(m):
+        fact_i = math.factorial(m-1-i)
+        quotient = rank_rem//fact_i
+        rank_rem = rank_rem%fact_i
+        perm[i] = nums[quotient]
+        nums = np.delete(nums,quotient)
+    s = ""
+    for p in perm:
+        s = s + str(p)
+    return(s)
+
+def pe_25(n):
+    fib_1 = 1
+    fib_2 = 1
+    fib_n = 2
+    while int(math.log10(fib_2))+1 < n:
+        temp = fib_1 + fib_2
+        fib_1 = fib_2
+        fib_2 = temp
+        fib_n = fib_n + 1
+    return(fib_n)
+
+def pe_27(n,m):
+    # n^2 + an + b
+    # |a|<n, |b|<= m
+    primes = pehelperfunctions.gen_primes(m)
+    max_prime = primes[len(primes)-1]
+    primes_n = len(primes)
+    max_chain = 0
+    for b in primes:
+        for a in range(-b+1,n):
+            n = 1
+            chain_n = 1
+            prime_cand = n**2 + a*n + b
+            if prime_cand < prime_cand:
+                primes = pehelperfunctions.gen_additional_primes_2(max_prime*5,primes)#5 arbitrary
+                primes_n = len(primes)
+                max_primes = primes[primes_n-1]
+            while prime_cand in primes:#could be improved
+                chain_n = chain_n +1
+                n = n+1
+                prime_cand = n**2 + a*n + b#could be +a -1 + 2n, (n-1)(n-1) = n^2 -2n+1
+                if prime_cand < prime_cand:
+                    primes = pehelperfunctions.gen_additional_primes_2(max_prime*5,primes)#5 arbitrary
+                    primes_n = len(primes)
+                    max_primes = primes[primes_n-1]
+            if chain_n > max_chain:
+                max_pair = a*b
+                max_chain = chain_n
+    return(max_pair)
+
+def pe_28(n):
+    #right upper odd^2
+    #left lower  even^2 + 1
+    #right lower odd*even + 1
+    #left upper  even*odd + 1
+    
+    diagonal_sum = np.sum(np.arange(1,n+1,2)**2)
+    diagonal_sum = diagonal_sum + np.sum(np.arange(2,n+1,2)**2+np.ones((n-1)//2))
+    main_diag = np.arange(1,n)*np.arange(2,n+1) + np.ones(n-1)
+    diagonal_sum = diagonal_sum + np.sum(main_diag)
+    return(diagonal_sum)
+
+def pe_29(n):
+    nums = np.arange(2,n+1)
+    distinct_powers = 0
+    for i in range(len(nums)):
+        powers = np.zeros(0,dtype = int)
+        power = nums[i]
+        if power > 0:
+            curr_power = power
+            exponent_power = 1
+            while curr_power < n+1:
+                nums[curr_power-2] = 0
+                powers = np.append(powers,exponent_power*np.arange(2,n+1))
+                curr_power = curr_power*power
+                exponent_power = exponent_power + 1
+            powers.sort()
+            distinct_powers = distinct_powers + 1
+            for i in range(1,len(powers)):
+                if powers[i-1] != powers[i]:
+                    distinct_powers = distinct_powers + 1
+    return(distinct_powers)
+
+def pe_30():
+    power_sum = 0
+    for i in range(2,354294):
+        digit_sum = 0
+        i_og = i
+        rem = i%10
+        i = i//10
+        while i > 0:
+            digit_sum = digit_sum + rem**5
+            rem = i%10
+            i = i//10
+        digit_sum = digit_sum + rem**5
+        if digit_sum == i_og:
+            power_sum = power_sum + i_og
+    return(power_sum)
+
+
+
 
 if __name__ == '__main__':
-    completed = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]
+    completed = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,23,24,25,27,28,29,30]
     inputs = {1:(3,5,1000),2:(4000000,),3:(600851475143,),4:(),5:(20,),6:(100,),7:(10001,),8:(PE_8_STRING,),9:(1000,),10:(2000000,),11:(PE_11_STRING,),12:(500,),
-13:(PE_13_STRING,),14:(1000000,),15:(20,20),16:(1000,),17:(),18:(PE_18_STRING,),19:(),20:(100,)}
+13:(PE_13_STRING,),14:(1000000,),15:(20,20),16:(1000,),17:(),18:(PE_18_STRING,),19:(),20:(100,),21:(10000,),23:(),24:(1000000,10),25:(1000,),27:(1000,1000),28:(1001,),
+29:(100,),30:()}
     total_time = 0
     for i in completed:
         pe_func = "pe_" + str(i)

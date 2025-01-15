@@ -66,6 +66,26 @@ def gen_additional_primes(n,primes,primes_ind):
     primes = prime_cand[np.nonzero(prime_cand)[0]]
     return(primes, primes_ind)
 
+def gen_additional_primes_2(n,primes):
+    #primes verdur ad innihalda ad minnsta kosti 2 og 3
+    #generates all primes up to n using primes up to some value k < n%prime
+    #same as gen_additional_primes but does not use primes_ind
+    prime_cand = np.arange(2,n+1)
+    for prime in primes:
+        index = np.arange(2,n//prime+1)*prime-2
+        prime_cand[index] = 0
+    index_p = primes[len(primes)-1]
+    
+    m = len(prime_cand)
+    while index_p < m:
+        prime = prime_cand[index_p]
+        if prime > 0:
+            index = np.arange(2,n//prime+1)*prime-2
+            prime_cand[index] = 0
+        index_p = index_p + 2
+    primes = prime_cand[np.nonzero(prime_cand)[0]]
+    return(primes)
+
 def is_leap(year):
     #works for positive years
     y_4 = year % 4
@@ -76,3 +96,34 @@ def is_leap(year):
     if y_100 == 0 and y_400 != 0:
         return(False)
     return(True)
+
+def divisor_sum(divisors,prime_key,n):
+    #returns the sum of proper divisors of n
+    m = len(divisors)
+    div_iter = [range(i+1) for i in divisors]
+    if m > 1:
+        set_mult = itertools.product(div_iter[0],div_iter[1])
+        for i in range(2,m):
+            set_mult = itertools.product(set_mult,div_iter[i])
+
+    else:
+        set_mult = [(i) for i in range(divisors[0]+1)]
+    div_sum = 0
+    for i in set_mult:
+        prod = 1
+        prime_index = len(divisors)-1
+        while not isinstance(i,int) :
+            prod = prod * (prime_key[prime_index]**i[1])
+            prime_index = prime_index-1
+            i = i[0]
+        prod = prod * (prime_key[0]**i)
+        div_sum = div_sum + prod
+    return(div_sum-n)
+
+
+
+
+
+
+
+
