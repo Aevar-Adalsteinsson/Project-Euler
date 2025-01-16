@@ -441,8 +441,8 @@ def pe_13(n_str):
     if carry > 0:
         digits = np.append(carry,digits)
     s = ""
-    for digit in digits:
-        s = s + str(digit)
+    for i in np.arange(10):
+        s = s + str(digits[i])
     return(s)
 
 def pe_14(n):
@@ -746,14 +746,241 @@ def pe_30():
             power_sum = power_sum + i_og
     return(power_sum)
 
+def pe_31(coins,amount):
+    #every coin must be a multiple of last coin
+    #coins and amount must be integers
+    #coins in increasing order
+    n = len(coins)
+    if n == 1:
+        return(1)
+    if n == 2:
+        return(amount//coins[1] + 1)
+    coin = coins[n-1]
+    sums = 0
+    for i in range(amount//coin+1):
+        sums_i = pe_31(coins[:(n-1)],amount-i*coin)
+        sums = sums + sums_i
+    return(sums)
 
+def pe_32():
+    digits = np.zeros(9,dtype = int)
+    pan_prods = np.empty(0,dtype = int)
+    for i in range(2,99):
+        i_dig = int(math.log10(i)) + 1
+        if i_dig == 1:
+            digits[0] = i
+        else:
+            digits[0] = i%10
+            quotient = i//10
+            if quotient == 0 or quotient == digits[0]:
+                continue
+            digits[1] = quotient
+        #lower bound for j = 10**(4-i_dig)
+        #upper bound for j = 10**5/i
+        for j in range(10**(4-i_dig),10000//i+1):
+            digits[i_dig:] = np.zeros(9-i_dig,dtype = int)
+            
+            j2 = j
+            digit_index = i_dig-1
+            flag = False
+            while j2>0:
+                digit_index = digit_index + 1
+                rem = j2%10
+                j2 = j2//10
+                if rem == 0 or rem in digits[:digit_index]:#pandigital condition
+                    flag = True
+                    break
+                digits[digit_index] = rem
+            if flag:
+                continue
+            product = i*j
+            
+            prod_dig = int(math.log10(product)) + 1
+            if prod_dig+1+4 != 9:
+                continue
+            
+            product2 = product
+            while product2>0:
+                digit_index = digit_index + 1
+                rem = product2%10
+                product2 = product2//10
+                if rem == 0 or rem in digits[:digit_index]:#pandigital condition
+                    flag = True
+                    break
+                digits[digit_index] = rem
+            if flag:
+                continue
+            if product not in pan_prods:
+                pan_prods = np.append(pan_prods,np.array([product]))
+    return(np.sum(pan_prods))
+
+def pe_34():
+    fact_digit_sum = 0
+    digits = np.zeros(7,dtype = int)
+    for i in range(10,2540160):
+        i_digs,i_index = pehelperfunctions.get_digits(digits,i)
+        vfunc = np.vectorize(math.factorial)
+        fact_sum = np.sum(vfunc(i_digs[:i_index]))
+        if i == fact_sum:
+            fact_digit_sum = fact_digit_sum + i
+    return(fact_digit_sum)
+
+def pe_35(n):
+    primes = pehelperfunctions.gen_primes(n)
+    n_primes = len(primes)
+    max_digits = int(math.log10(primes[len(primes)-1])) + 1
+    digits = np.zeros(max_digits,dtype=int)
+    circ_dict = {2:True,3:True,5:True,7:True}
+    n_circ = 4
+    for p in primes[4:]:
+        p_ndig = int(math.log10(p)) + 1
+        p_dig, p_ind = pehelperfunctions.get_digits(digits[:p_ndig],p)
+        flag = False
+        for digit in p_dig:
+            if digit%2 == 0 or digit == 5:
+                flag = True
+                break
+        if flag:
+            continue
+        flag = False
+        
+        circ_cand = np.zeros(p_ndig)
+        circ_cand[0] = p
+        min_circ = math.inf
+        for i in range(1,p_ndig):
+            p_cand = 0
+            for j in range(p_ndig):
+                p_cand = p_cand + p_dig[(j+i)%p_ndig]*(10**j)
+            min_circ = min(min_circ,p_cand)
+            circ_cand[i] = p_cand
+            if not pehelperfunctions.bin_search_check(primes,p_cand,0,n_primes):
+                flag = True
+                break
+        if flag:
+            continue
+        if min_circ not in circ_dict:
+            for circ in circ_cand:
+                circ_dict[circ] = True
+    return(len(circ_dict))
+
+def pe_36(n):
+    pal_sum = 0
+    for i in np.arange(1,n):
+        if pehelperfunctions.is_palindrome(i):
+            bin_str = bin(i)[2:]
+            if pehelperfunctions.is_palindrome_str(bin_str):
+                pal_sum = pal_sum + i
+                #print(i)
+    return(pal_sum)
+
+def pe_37():
+    n = 1000000
+    primes = pehelperfunctions.gen_primes(n)
+    dig1_primes = [2,3,5,7]
+    trunc_sum = 0
+    for p in primes[4:]:
+        p_n = int(math.log10(p))+1
+        digits = pehelperfunctions.get_digits_2(p)
+        
+        if digits[0] not in dig1_primes:
+            continue
+        if digits[p_n-1] not in dig1_primes[1:]:
+            continue
+        flag = False
+        for i in np.arange(1,p_n-1):
+            if digits[i]%2 == 0:
+                flag = True
+                break
+        if flag:
+            continue
+        p_left = p
+        p_right = p
+        for i in np.arange(p_n-1):
+            p_left = p_left % 10**(p_n-i-1)
+            p_right = p_right//10
+            if p_left not in primes or p_right not in primes:
+                flag = True
+                break
+        if flag:
+            continue
+        trunc_sum = trunc_sum + p
+    return(trunc_sum)
+
+def pe_38():
+    #9(1,2,3,4,5) = 918273645 exists so the leading digit must be 9
+    pandig_max = 918273645
+    for i in np.arange(2,5):
+        #i number of digit
+        for n in np.arange(9*(10**i)+1,10**(i+1)):
+            digits = pehelperfunctions.get_digits_2(n)
+            if 0 in digits:
+                continue
+            if len(digits) != len(set(digits)):
+                continue
+            s = ""#
+            mult_ind = 1
+            while len(s)<9:
+                s = s + str(n*mult_ind)
+                mult_ind = mult_ind + 1
+            s_len = len(s)
+            if s_len != 9 or "0" in s or s_len != len(set(s)):
+                continue
+            m = int(s)
+            if m > pandig_max:
+                pandig_max = m
+    return(pandig_max)
+
+def pe_39(n):
+    int_tri_max = 0
+    max_i = 0
+    for i in np.arange(6,n+1):
+        pyth_n = 0
+        for a in np.arange(1,i//3):
+            r = i-a
+            b = (r**2-a**2)/(2*r)
+            c = r-b
+            if b == int(b):
+                pyth_n = pyth_n + 1
+        if pyth_n > int_tri_max:
+            int_tri_max = pyth_n
+            max_i = i
+    return(max_i)
+
+def pe_40():
+    def get_dec_digit(n):
+        if n < 10:
+            return(n)
+        n = n - 10
+        dig = 2
+        while True:
+            tot_dig = dig*9*(10**(dig-1))
+            if tot_dig > n:
+                break
+            n = n-tot_dig
+            dig = dig + 1
+        quot = n//dig
+        rem = n%dig
+    
+        num = 10**(dig-1) + quot
+        digit = num//10**(dig-1-rem)
+        digit = digit%10
+        return(digit)
+    digs = 10**np.arange(7)
+    prod = 1
+    for dig in digs:
+        prod = prod*get_dec_digit(dig)
+    return(prod)
+
+
+
+    
 
 
 if __name__ == '__main__':
-    completed = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,23,24,25,27,28,29,30]
+    completed = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,23,24,25,27,28,29,30,31,32,34,35,36,37,38,39,40]
     inputs = {1:(3,5,1000),2:(4000000,),3:(600851475143,),4:(),5:(20,),6:(100,),7:(10001,),8:(PE_8_STRING,),9:(1000,),10:(2000000,),11:(PE_11_STRING,),12:(500,),
 13:(PE_13_STRING,),14:(1000000,),15:(20,20),16:(1000,),17:(),18:(PE_18_STRING,),19:(),20:(100,),21:(10000,),23:(),24:(1000000,10),25:(1000,),27:(1000,1000),28:(1001,),
-29:(100,),30:()}
+29:(100,),30:(),31:([1,2,5,10,20,50,100,200],200),32:(),34:(),35:(1000000,),36:(1000000,),37:(),38:(),39:(1000,),40:()}
     total_time = 0
     for i in completed:
         pe_func = "pe_" + str(i)

@@ -10,6 +10,16 @@ def is_palindrome(n):
     n_str_rev = n_str[::-1]
     return(n_str == n_str_rev)
 
+def is_palindrome_str(s):
+    #more primite solution might be quicker
+    n = len(s)
+    if n <= 1:
+        return(True)
+    for i in np.arange(n//2):
+        if not s[i] == s[n-1-i]:
+            return(False)
+    return(True)
+
 def gen_primes(n):
     prime_cand = np.arange(2,n+1)
     upper_bound = n/np.log(n)*1.25506
@@ -120,7 +130,41 @@ def divisor_sum(divisors,prime_key,n):
         div_sum = div_sum + prod
     return(div_sum-n)
 
+def get_digits(digits,n):
+    rem = n%10
+    n = n//10
+    digit_index = 0
+    while n > 0:
+        digits[digit_index] = rem
+        digit_index = digit_index + 1
+        rem = n%10
+        n = n//10
+    digits[digit_index] = rem
+    return(digits,digit_index+1)
 
+def get_digits_2(n):
+    n_dig = int(math.log10(n))+1
+    digits = np.zeros(n_dig)
+    rem = n%10
+    n = n//10
+    digit_index = n_dig-1
+    while n > 0:
+        digits[digit_index] = rem
+        digit_index = digit_index - 1
+        rem = n%10
+        n = n//10
+    digits[digit_index] = rem
+    return(digits)
+
+def bin_search_check(x,cand,i,j):
+    if j-i == 1:
+        return(x[i]==cand)
+    middle = i + (j-i)//2
+    comp = x[middle]
+    if comp <= cand:
+        return(bin_search_check(x,cand,middle,j))
+    else:
+        return(bin_search_check(x,cand,i,middle))
 
 
 

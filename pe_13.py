@@ -35,8 +35,8 @@ def pe_13(n_str):
     if carry > 0:
         digits = np.append(carry,digits)
     s = ""
-    for digit in digits:
-        s = s + str(digit)
+    for i in np.arange(10):
+        s = s + str(digits[i])
     return(s)
 
 if __name__ == '__main__':
