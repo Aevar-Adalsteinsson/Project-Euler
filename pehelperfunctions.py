@@ -53,6 +53,21 @@ def get_prime_divisors(n,primes,primes_ind):
             divisors[index] = divisors[index] + 1
     return(divisors)
 
+def get_prime_divisor_n(n,primes):
+    #get number of prime divisors of n 
+    m = len(primes)
+    if n == 1:
+        return(0)
+    prime_div_n = 0
+    for prime in primes:
+        if n%prime == 0:
+            prime_div_n += + 1
+            while n%prime == 0:
+                n = n/prime
+            if n == 1:
+                return(prime_div_n)
+    return(prime_div_n)
+
 def gen_additional_primes(n,primes,primes_ind):
     #primes must contain 2 and 3
     #primes contains all primes less than some k < n
@@ -166,8 +181,57 @@ def bin_search_check(x,cand,i,j):
     else:
         return(bin_search_check(x,cand,i,middle))
 
+def prev_pandigital(digits,n):
+    #returns the next pandigital number that is less than digits
+    #n is the number of digits of digits
+    #if digits is the lowest pandigital number with n digits then return digits
+    index = n-1
+    curr = digits[index]
+    prev_digits = np.array([curr])
+    count = 0
+    while True:
+        index = index - 1
+        if index < 0:
+            return(digits)
+        prev = curr
+        curr = digits[index]
 
+        if curr > prev:
+            break
+        prev_digits = np.append(np.array([curr]),prev_digits)
+    prev_digits = np.sort(prev_digits)
+    next_ind = np.searchsorted(prev_digits,curr)
+    prev_digits = np.flip(prev_digits)
+    next_ind = len(prev_digits)-next_ind
 
+    digits[index] = prev_digits[next_ind]
+    prev_digits[next_ind] = curr
+    digits = np.append(digits[:(index+1)],prev_digits)
+    return(digits)
 
+def next_pandigital(digits,n):
+    #returns the next pandigital number that is higher than digits
+    #n is the number of digits of digits
+    #if digits is the highest pandigital number with n digits then return digits
+    index = n-1
+    curr = digits[index]
+    prev_digits = np.array([curr])
+    count = 0
+    while True:
+        index = index - 1
+        if index < 0:
+            return(digits)
+        prev = curr
+        curr = digits[index]
+
+        if curr < prev:
+            break
+        prev_digits = np.append(np.array([curr]),prev_digits)
+    prev_digits = np.sort(prev_digits)
+    next_ind = np.searchsorted(prev_digits,curr, side='right')
+    digits[index] = prev_digits[next_ind]
+    prev_digits[next_ind] = curr
+    digits = np.append(digits[:(index+1)],prev_digits)
+    return(digits)
 
 
