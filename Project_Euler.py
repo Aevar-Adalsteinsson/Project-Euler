@@ -971,16 +971,253 @@ def pe_40():
         prod = prod*get_dec_digit(dig)
     return(prod)
 
+def pe_41():
+    for m in np.arange(9,0,-1):
+        digits = np.arange(m,0,-1)
+        pandig = np.sum(10**np.arange(m-1,-1,-1)*digits)
+        n = int(np.sqrt(pandig))+1
+        primes = pehelperfunctions.gen_primes(n)
+        count = 0
+        bound = math.factorial(m)
+        while count < bound:
+            prev_digits = np.copy(digits)
+            digits = pehelperfunctions.prev_pandigital(digits,m)
+            diff = np.sum(10**np.arange(m-1,-1,-1)*(digits-prev_digits))
+            pandig = pandig + diff
+            count = count + 1
+            flag = True
+            for p in primes:
+                if pandig%p == 0:
+                    flag = False
+                    break
+            if flag:
+                return(pandig)
 
+def pe_43():
+    def digits_next(digits,ind):
+        dig_sort = np.sort(digits[ind:])
+        dig_sort = np.flip(dig_sort)
+        digits = np.append(digits[:ind],dig_sort)
+        digits = pehelperfunctions.next_pandigital(digits,len(digits))
+        return(digits)
+    pan_sum = 0.0
+    digits = np.array([1,0,2,3,4,5,6,7,8,9],dtype = float)
+    primes = np.array([2,3,5,7,11,13,17])
+    highest = np.array([9,8,7,6,5,4,3,2,1,0],dtype = float)
+    count = 0
+    while not (highest == digits).all():
+        flag = False
+        for i in np.arange(7):
+            ind = i+1
+            num = digits[ind]*100 + digits[ind+1]*10 + digits[ind+2]
+            if num%primes[i] != 0:
+                digits = digits_next(digits,i+4)
+                flag = True
+                break
+        if flag:
+            continue
+        pan_sum = pan_sum + np.sum(10**np.arange(10-1,-1,-1)*digits)
+        digits = pehelperfunctions.next_pandigital(digits,len(digits))
+    return(pan_sum)  
 
+def pe_44():
+    m = 1.0
     
+    while True:
+        p = m*(3*m-1)/2 
+        upper = int((1+np.sqrt(1+24*p))/6)+1
+        for i in np.arange(1,upper):
+            n = (2*p - 3*i*i + i)/(6*i)
+            if n.is_integer() and n != 0:
+                n_i = n+i
+                
+                p_n = n*(3*n-1)/2
+                p_n_i = n_i*(3*n_i-1)/2
+            
+                p_sum = p_n_i + p_n
+            
+                p_sum_n = (1+np.sqrt(1+24*p_sum))/6
+                if p_sum_n.is_integer():
+                    return(p)
+        m = m + 1
 
+def pe_45():
+    n = 144.0
+    while True:
+        hex_n = n*(2*n-1)
+        pent_n = (1+np.sqrt(1+24*hex_n))/6
+        if not pent_n.is_integer():
+            n = n+1
+            continue
+        tri_n = (-1+np.sqrt(1+8*hex_n))/2
+        if tri_n.is_integer():
+            return(hex_n)
+        n = n+1
+
+def pe_46():
+    primes = pehelperfunctions.gen_primes(100000)
+    p_n = len(primes)
+    n = 35
+    while True:
+        if n in primes:
+            n = n+2
+            continue
+        ind = 0
+        flag = False
+        while ind < p_n:
+            p = primes[ind]
+            if p >= n:
+                break
+            square = (n-p)/2
+            if np.sqrt(square).is_integer():
+                flag = True
+                break
+            ind = ind + 1
+        if flag:
+            n = n+2
+            continue
+        return(n)
+
+def pe_47():
+    distinct_n = 0
+    n = 4
+    primes = [2,3,5,7]
+    next_prime = 5
+    next_prime_ind = 2
+    primes_ind = {2:0,3:1}
+    max_prime = primes[len(primes)-1]
+    while distinct_n < 4:
+        if next_prime - (n-1) + distinct_n <= 3:
+            distinct_n = 0
+            n = next_prime + 1
+            prev_prime = next_prime
+            next_prime_ind += 1
+            next_prime = primes[next_prime_ind]
+            while next_prime - prev_prime < 5:
+                if next_prime >= max_prime:
+                    primes, primes_ind = pehelperfunctions.gen_additional_primes(n*5,primes,primes_ind)#5 arbitrarily chosen
+                    max_prime = primes[len(primes)-1]
+                n = next_prime+1
+                prev_prime = next_prime
+                next_prime_ind += 1
+                next_prime = primes[next_prime_ind]
+                
+            if next_prime >= max_prime:
+                primes, primes_ind = pehelperfunctions.gen_additional_primes(n*5,primes,primes_ind)#5 arbitrarily chosen
+                max_prime = primes[len(primes)-1]
+        if max_prime < n:
+            primes, primes_ind = pehelperfunctions.gen_additional_primes(n*5,primes,primes_ind)#5 arbitrarily chosen
+            max_prime = primes[len(primes)-1]
+        prime_div_n = pehelperfunctions.get_prime_divisor_n(n,primes[:(next_prime_ind+1)])
+        if prime_div_n >= 4:
+            distinct_n += 1
+        else:
+            distinct_n = 0
+        n = n+1
+    return(n-4)
+
+def pe_48(n):
+    digits = np.zeros(10,dtype = int)
+    for i in np.arange(1,n+1):
+        i_digits = np.zeros(10,dtype = int)
+        ind = 9
+        k = i
+        while k > 0 and ind >= 0:
+            i_digits[ind] = k%10
+            k = k//10
+            ind -= 1
+        for j in np.arange(i-1):
+            i_digits = i_digits*i
+            carry = 0
+            for l in np.arange(10):
+                i_digits[9-l] = i_digits[9-l] + carry
+                carry = i_digits[9-l]//10
+                i_digits[9-l] = i_digits[9-l]%10
+        digits = digits + i_digits
+    carry = 0
+    for l in np.arange(10):
+        digits[9-l] = digits[9-l] + carry
+        carry = digits[9-l]//10
+        digits[9-l] = digits[9-l]%10
+    s = ""
+    for digit in digits:
+        s = s + str(digit)
+    return(s)
+
+def pe_49():
+    primes = pehelperfunctions.gen_primes(10000)
+    ind = np.searchsorted(primes,1000)
+    primes = primes[ind:]
+    prime_n = len(primes)
+    for i in np.arange(prime_n-3):
+        p_1 = primes[i]
+        digits = pehelperfunctions.get_digits_2(p_1)
+        digits = np.sort(digits)
+        for j in np.arange(i+1,prime_n-2):
+            arith_n = 2
+            p_2 = primes[j]
+            digits_j = np.sort(pehelperfunctions.get_digits_2(p_2))
+            inc = p_2 - p_1
+            arith_concat = str(p_1) + str(p_2)
+            if (digits_j == digits).all():
+                p_curr = p_2
+                while arith_n < 3:
+                    
+                    p_curr = p_curr + inc
+                    digits_curr = np.sort(pehelperfunctions.get_digits_2(p_curr))
+                    prime_ind = np.searchsorted(primes,p_curr)
+                    if p_curr < 10000 and (digits_curr == digits).all() and p_curr == primes[prime_ind]:
+                        arith_n = arith_n + 1
+                        arith_concat = arith_concat + str(p_curr)
+                    else:
+                        break
+                if arith_n == 3:
+                    if p_1 == 1487:
+                        continue
+                    return(arith_concat)
+
+def pe_50(n):
+    primes = pehelperfunctions.gen_primes(n)
+    primes_n = len(primes)
+
+    con_p_sum = np.zeros(n+1,dtype = int)
+    p_ind = 0
+    max_con = 0
+    max_p = 0
+    for i in np.arange(primes_n):
+        p = primes[primes_n-1-i]
+        con_sum = 0
+        con_n = 0
+        p_ind = 0
+        while con_sum < p:
+            con_sum += primes[p_ind]
+            p_ind += 1
+            con_n += 1
+        if con_n < max_con:
+            return(max_p)
+        high_ind = p_ind
+        low_ind = 0
+        while con_sum != p and con_n > max_con:
+            if con_sum > p:
+                con_sum = con_sum - primes[low_ind]
+                con_n = con_n -1
+                low_ind += 1
+            else:
+                con_sum = con_sum + primes[high_ind]
+                con_n = con_n +1
+                high_ind +=1
+        if con_sum == p:
+            if con_n > max_con:
+                max_con = con_n
+                max_p = p
+    return(max_p)
 
 if __name__ == '__main__':
-    completed = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,23,24,25,27,28,29,30,31,32,34,35,36,37,38,39,40]
+    completed = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,23,24,25,27,28,29,30,31,32,34,35,36,37,38,39,40,41,43,44,45,46,47,48,49,50]
     inputs = {1:(3,5,1000),2:(4000000,),3:(600851475143,),4:(),5:(20,),6:(100,),7:(10001,),8:(PE_8_STRING,),9:(1000,),10:(2000000,),11:(PE_11_STRING,),12:(500,),
 13:(PE_13_STRING,),14:(1000000,),15:(20,20),16:(1000,),17:(),18:(PE_18_STRING,),19:(),20:(100,),21:(10000,),23:(),24:(1000000,10),25:(1000,),27:(1000,1000),28:(1001,),
-29:(100,),30:(),31:([1,2,5,10,20,50,100,200],200),32:(),34:(),35:(1000000,),36:(1000000,),37:(),38:(),39:(1000,),40:()}
+29:(100,),30:(),31:([1,2,5,10,20,50,100,200],200),32:(),34:(),35:(1000000,),36:(1000000,),37:(),38:(),39:(1000,),40:(),41:(),43:(),44:(),45:(),46:(),47:(),48:(1000,),
+49:(),50:(1000000,)}
     total_time = 0
     for i in completed:
         pe_func = "pe_" + str(i)

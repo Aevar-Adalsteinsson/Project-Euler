@@ -5,9 +5,9 @@ import itertools
 import pehelperfunctions
 
 def pe_50(n):
-    primes = gen_primes(n)
+    primes = pehelperfunctions.gen_primes(n)
     primes_n = len(primes)
-    #print(len(primes))
+
     con_p_sum = np.zeros(n+1,dtype = int)
     p_ind = 0
     max_con = 0

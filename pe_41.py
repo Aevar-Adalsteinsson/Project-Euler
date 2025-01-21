@@ -18,14 +18,12 @@ def pe_41():
             diff = np.sum(10**np.arange(m-1,-1,-1)*(digits-prev_digits))
             pandig = pandig + diff
             count = count + 1
-            #print(pandig)
             flag = True
             for p in primes:
                 if pandig%p == 0:
                     flag = False
                     break
             if flag:
-                #print(pandig)
                 return(pandig)
 
 if __name__ == '__main__':
