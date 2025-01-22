@@ -20,6 +20,13 @@ def is_palindrome_str(s):
             return(False)
     return(True)
 
+def is_palindrome_digits(digits):
+    n_digits = len(digits)
+    for i in range(n_digits//2+1):
+        if digits[i] != digits[n_digits-1-i]:
+            return(False)
+    return(True)
+
 def gen_primes(n):
     prime_cand = np.arange(2,n+1)
     upper_bound = n/np.log(n)*1.25506
@@ -111,6 +118,27 @@ def gen_additional_primes_2(n,primes):
     primes = prime_cand[np.nonzero(prime_cand)[0]]
     return(primes)
 
+def is_prime(primes,cand):
+    n = len(primes)
+    max_p = primes[n-1]
+    if cand <= max_p:
+        ind = np.searchsorted(primes,cand)
+        if ind < n and primes[ind] == cand:
+            return(True)
+        else:
+            return(False)
+    for p in primes:
+        if cand%p == 0:
+            return(False)
+    if cand > max_p**2:
+        i = max_p + 2
+        upper = int(np.sqrt(cand))+1
+        while i <= upper:
+            if cand%i == 0:
+                return(False)
+            i = i+2
+    return(True)
+
 def is_leap(year):
     #works for positive years
     y_4 = year % 4
@@ -170,6 +198,27 @@ def get_digits_2(n):
         n = n//10
     digits[digit_index] = rem
     return(digits)
+
+def digits_sum(digs_1,digs_2):
+    #digs_1 larger than digs_2
+    n = len(digs_1)
+    m = len(digs_2)
+    carry = 0
+    for i in np.arange(m):
+        res = digs_1[n-1-i] + digs_2[m-1-i] + carry
+        carry = res//10
+        res = res%10
+        digs_1[n-1-i] = res
+    ind = m
+    while carry != 0:
+        if ind >= n:
+            return(np.append(np.array([carry]),digs_1))
+        res = digs_1[n-1-ind] + carry
+        carry = res//10
+        res = res%10
+        digs_1[n-1-ind] = res
+        ind = ind + 1
+    return(digs_1)
 
 def bin_search_check(x,cand,i,j):
     if j-i == 1:

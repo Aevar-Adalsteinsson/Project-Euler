@@ -1212,12 +1212,245 @@ def pe_50(n):
                 max_p = p
     return(max_p)
 
+def pe_51():
+    n = 1000000
+    primes = pehelperfunctions.gen_primes(n)
+    
+    
+    max_rep = 0
+    for p in primes[4:]:
+        digits_n = int(math.log10(p))+1
+        
+        dig_012 = np.zeros(3,dtype = int)
+        dig_012_place = [[],[],[]]
+        p_dig = p #replacing the last digit can only produce at most 4 prime digit replacements
+        dig_ind = 0
+        while p_dig != 0:
+            dig = p_dig%10
+            if dig < 3:
+                dig_012[dig] = dig_012[dig] + 1
+                dig_012_place[dig].append(dig_ind)
+            p_dig = p_dig//10
+            dig_ind = dig_ind + 1
+        last_dig = p%10
+        if last_dig < 3:
+            dig_012[last_dig] = dig_012[last_dig] - 1
+        
+
+        for i in np.arange(len(dig_012)):
+            dig_i = dig_012[i]
+            if dig_i == 0:
+                continue
+            
+            if last_dig == i:
+                place_inc = 1
+            else:
+                place_inc = 0
+            for j in np.arange(1,2**dig_i):
+                indices = list(format(j,'#0' + str(dig_i+2) + 'b')[2:])
+                indices = list(map(int, indices))
+                
+                
+                increment = 0
+                for k in np.arange(len(indices)):
+                    index = indices[k]
+                    if index == 1:
+                        increment = increment + 10**dig_012_place[i][k + place_inc]
+                    
+                
+
+                p_cand = p - i*increment
+                
+                p_cand_ind = 0
+                if digits_n-1 in dig_012_place[i]:#candidates must have the same number of digits
+
+                    p_cand = p_cand + increment
+                    p_cand_ind = p_cand_ind + 1
+                
+                p_count = 0
+                while p_cand_ind < 10:
+                    if p_cand in primes:
+                        p_count = p_count + 1
+                    p_cand = p_cand + increment
+                    p_cand_ind = p_cand_ind + 1
+                if p_count > max_rep:
+                    max_rep = p_count
+                    if p_count == 8:
+                        return(p)
+
+def pe_52():
+    for i in np.arange(3,7):
+        for j in np.arange(10**i,10**(i+1)//6+1):
+            j_digits = pehelperfunctions.get_digits_2(j)
+            j_digits.sort()
+            flag = True
+            for k in np.arange(2,7):
+                digits = pehelperfunctions.get_digits_2(k*j)
+                digits.sort()
+                if not all(j_digits == digits):
+                    flag = False
+                    break
+            if flag:
+                return(j)
+
+def pe_53():
+    m = 100
+    log_n = np.log(np.arange(1,m+1))
+    log_fact_n = np.zeros(m+1)
+    for i in np.arange(1,m+1):
+        log_fact_n[i] = log_fact_n[i-1]+log_n[i-1]
+    mill_log = np.log(10**6)
+    count = 0
+    for n in np.arange(1,m+1):
+        for r in np.arange(n):#it is possible to reduce the number by half by use of symmetry
+            log_fact = log_fact_n[n]-log_fact_n[r]-log_fact_n[n-r]
+            if log_fact>mill_log:
+                count = count + 1
+    return(count)
+
+def pe_55():
+    def reverse_num(digits):
+        n = len(digits)
+        rev = np.zeros(n)
+        for i in np.arange(n):
+            rev[i] = digits[n-1-i]
+        return(rev)
+    lych_n = 0
+    for i in np.arange(5,10000):
+        count = 0
+        lychrel_cand = pehelperfunctions.get_digits_2(i)
+        flag = True
+        while count <= 50:
+            rev = reverse_num(lychrel_cand)
+            lychrel_cand = pehelperfunctions.digits_sum(lychrel_cand,rev)
+            if pehelperfunctions.is_palindrome_digits(lychrel_cand):
+                flag = False
+                break
+            count = count + 1
+        if flag:
+            lych_n = lych_n + 1
+    return(lych_n)
+
+def pe_57():
+    count = 0
+    nom = 1
+    denom = 2
+    for i in np.arange(1000):
+        nom = nom + 2*denom
+        temp = denom
+        denom = nom
+        nom = temp
+        nom_final = nom+denom
+        if int(math.log10(nom_final)) > int(math.log10(denom)):
+            count = count+1
+    return(count)
+
+def pe_58():
+    n = 10**3
+    primes = pehelperfunctions.gen_primes(n)
+
+    total = 1
+    n_p = 0
+    m = 1
+    while True:
+        p_1 = 2*m*(2*m+1) + 1
+        p_2 = (2*m+1)**2
+        p_3 = (2*m)**2+1
+        p_4 = (2*m)*(2*m-1) + 1
+        
+        if pehelperfunctions.is_prime(primes,p_1):
+            n_p = n_p + 1
+        if pehelperfunctions.is_prime(primes,p_3):
+            n_p = n_p + 1
+        if pehelperfunctions.is_prime(primes,p_4):
+            n_p = n_p + 1
+        total = total+4
+        if n_p/total < 0.1:
+            return(2*m+1)
+        m = m+1
+
+def pe_60():
+    def nested_pairs(duos,duo_primes,duo_primes_ind,duo_pairs,prime_pairs):
+        n = len(prime_pairs)
+        m = len(duo_primes)
+        if n == 5:
+            return(np.sum(prime_pairs))
+        if n == 0:
+            low = 0
+        else:
+            low = duo_primes_ind[prime_pairs[n-1]]+1
+            if low >= m:
+                return(None)
+        for i in np.arange(low,m):
+            prime = duo_primes[i]
+            if all(x in duo_pairs[duo_primes_ind[prime]] for x in prime_pairs):
+                prime_sum = nested_pairs(duos,duo_primes,duo_primes_ind,duo_pairs,np.append(prime_pairs,np.array([prime])))
+                if prime_sum is not None:
+                    return(prime_sum)
+        return(None)
+    def is_prime(primes,cand):
+        #cand is larger than the biggest prime in primes but not larger than the square of the biggest prime
+        for p in primes:
+            if cand%p == 0:
+                return(False)
+        return(True)
+    n = 10000
+    primes = pehelperfunctions.gen_primes(n)
+    last_prime = primes[len(primes)-1]
+    
+    
+    duos = []
+    for i in np.arange(1,len(primes)):
+        p_1 = primes[i]
+        p_1_dig = int(math.log10(p_1))+1
+        for j in np.arange(i):
+            p_2 = primes[j]
+            p_2_dig = int(math.log10(p_2))+1
+            
+            p_12 = p_1*(10**p_2_dig) + p_2
+            p_21 = p_2*(10**p_1_dig) + p_1
+            
+            if p_12 in primes and p_21 in primes:
+                duos.append((p_1,p_2))
+            if p_12 > last_prime or p_21 > last_prime:
+                if int(np.sqrt(p_12)) < last_prime and int(np.sqrt(p_21)) < last_prime:
+                    if is_prime(primes,p_12) and is_prime(primes,p_21):
+                        duos.append((p_1,p_2))
+    
+    
+    duo_primes = []
+    for d in duos:
+        p_1 = d[0]
+        p_2 = d[1]
+        
+        if p_1 not in duo_primes:
+            duo_primes.append(p_1)
+        if p_2 not in duo_primes:
+            duo_primes.append(p_2)
+    duo_primes.sort()
+    
+    duo_primes_ind = {}
+    for i in np.arange(len(duo_primes)):
+        duo_primes_ind[duo_primes[i]] = i
+    
+    duo_pairs = [ [] for _ in range(len(duo_primes)) ]
+    for pair in duos:
+        p_1 = pair[0]
+        p_2 = pair[1]
+        
+        duo_pairs[duo_primes_ind[p_1]].append(p_2)
+        duo_pairs[duo_primes_ind[p_2]].append(p_1)
+        
+
+    prime_sum = nested_pairs(duos,duo_primes,duo_primes_ind,duo_pairs,np.array([]))
+    return(int(prime_sum))
+
 if __name__ == '__main__':
-    completed = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,23,24,25,27,28,29,30,31,32,34,35,36,37,38,39,40,41,43,44,45,46,47,48,49,50]
+    completed = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,23,24,25,27,28,29,30,31,32,34,35,36,37,38,39,40,41,43,44,45,46,47,48,49,50,51,52,53,55,57,58,59,60]
     inputs = {1:(3,5,1000),2:(4000000,),3:(600851475143,),4:(),5:(20,),6:(100,),7:(10001,),8:(PE_8_STRING,),9:(1000,),10:(2000000,),11:(PE_11_STRING,),12:(500,),
 13:(PE_13_STRING,),14:(1000000,),15:(20,20),16:(1000,),17:(),18:(PE_18_STRING,),19:(),20:(100,),21:(10000,),23:(),24:(1000000,10),25:(1000,),27:(1000,1000),28:(1001,),
 29:(100,),30:(),31:([1,2,5,10,20,50,100,200],200),32:(),34:(),35:(1000000,),36:(1000000,),37:(),38:(),39:(1000,),40:(),41:(),43:(),44:(),45:(),46:(),47:(),48:(1000,),
-49:(),50:(1000000,)}
+49:(),50:(1000000,),51:(),52:(),53:(),55:(),57:(),58:(),60:()}
     total_time = 0
     for i in completed:
         pe_func = "pe_" + str(i)
