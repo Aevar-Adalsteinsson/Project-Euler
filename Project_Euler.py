@@ -612,6 +612,25 @@ def pe_21(n):
                 amic_sum = amic_sum + i + i_sum
     return(amic_sum)
 
+def pe_22():
+    f = open("pe_22_names.txt", "r")
+
+    names = f.read()
+    names = names.split("\",\"")
+    n = len(names)
+    names[0] = names[0][1:]
+    names[n-1] = names[n-1][:-1]
+    names.sort()
+    
+    names_score = 0
+    for i in np.arange(len(names)):
+        name = names[i]
+        score = 0
+        for j in np.arange(len(name)):
+            score += ord(name[j])-64
+        names_score += (i+1)*score
+    return(names_score)
+
 def pe_23():
     n = 28123
     primes = pehelperfunctions.gen_primes(n+1)
@@ -993,6 +1012,28 @@ def pe_41():
             if flag:
                 return(pandig)
 
+def pe_42():
+    f = open("pe_42_words.txt", "r")
+    words = f.read()
+    words = words.split(",")
+    words = [word[1:-1] for word in words]
+
+    max_tri = 0
+    max_tri_n = 0
+    tri = []
+    tri_n = 0
+    for word in words:
+        val = 0
+        for c in word:
+            val += ord(c)-64
+        while val > max_tri:
+            max_tri_n += 1
+            max_tri = max_tri_n*(max_tri_n+1)//2
+            tri.append(max_tri)
+        if val in tri:#binary search or turn tri into set for more efficiency
+            tri_n += 1
+    return(tri_n)
+
 def pe_43():
     def digits_next(digits,ind):
         dig_sort = np.sort(digits[ind:])
@@ -1308,6 +1349,200 @@ def pe_53():
                 count = count + 1
     return(count)
 
+def pe_54():
+    def is_flush(hand_1,hand_2):
+        sort_1 = hand_1[0][1]
+        sort_2 = hand_2[0][1]
+        flag_1 = True
+        flag_2 = True
+        for i in range(1,5):
+            sort_1i = hand_1[i][1]
+            sort_2i = hand_2[i][1]
+            if sort_1i != sort_1:
+                flag_1 = False
+            if sort_2i != sort_2:
+                flag_2 = False
+        flush_1 = flag_1
+        flush_2 = flag_2
+        return((flush_1,flush_2))
+    def is_straight(rank_1,rank_2,rank):
+        low_1 = rank_1[0]
+        low_2 = rank_2[0]
+        flag_1 = True
+        flag_2 = True
+        for i in range(1,5):
+            rank_1i = rank_1[i]
+            rank_2i = rank_2[i]
+            if rank_1i != low_1+i:
+                if i == 4 and rank_1i == 12 and low_1 == 0:
+                    pass
+                else:
+                    flag_1 = False
+            if rank_2i != low_2+i:
+                if i == 4 and rank_2i == 12 and low_2 == 0:
+                    pass
+                else:
+                    flag_2 = False
+        straight_1 = flag_1
+        straight_2 = flag_2
+        return((straight_1,straight_2))
+    def get_pairs(rank_1,rank_2):
+        #all ranks and their multiplicity, one card, pair,trips and quads
+        pairs_1 = []
+        pairs_2 = []
+        
+        prev_rank_1 = rank_1[0]
+        prev_rank_2 = rank_2[0]
+        count_1 = 1
+        count_2 = 1
+        for i in range(1,5):
+            rank_i1 = rank_1[i]
+            rank_i2 = rank_2[i]
+            if rank_i1 == prev_rank_1:
+                count_1 += 1
+            else:
+                pairs_1.append((count_1,prev_rank_1))
+                count_1 = 1
+            if rank_i2 == prev_rank_2:
+                count_2 += 1
+            else:
+                pairs_2.append((count_2,prev_rank_2))
+                count_2 = 1
+            prev_rank_1 = rank_i1
+            prev_rank_2 = rank_i2
+        pairs_1.append((count_1,prev_rank_1))
+        pairs_2.append((count_2,prev_rank_2))
+        pairs_1.sort(reverse = True)
+        pairs_2.sort(reverse = True)
+        return((pairs_1,pairs_2))
+        
+    f = open("pe_54_poker.txt", "r")
+
+    poker = f.read()
+    poker = poker.split("\n")
+    poker = poker[:(len(poker)-1)]
+    
+    rank = {'2':0,'3':1,'4':2,'5':3,'6':4,'7':5,'8':6,'9':7,'T':8,'J':9,'Q':10,'K':11,'A':12}
+    n = len(poker)
+    p1_wins = 0
+    for i in range(n):
+        hands = poker[i]
+        hands = hands.split(" ")
+        hand_1 = hands[:5]
+        hand_2 = hands[5:]
+        
+        rank_1 = []
+        rank_2 = []
+        for j in range(5):
+            rank_1.append(rank[hand_1[j][0]])
+            rank_2.append(rank[hand_2[j][0]])
+        rank_1.sort()
+        rank_2.sort()
+        
+        flush_1, flush_2 = is_flush(hand_1,hand_2)
+        straight_1, straight_2 = is_straight(rank_1,rank_2,rank)
+        pairs_1, pairs_2 = get_pairs(rank_1,rank_2)
+        
+        #straigt flush and royal flush
+        if flush_1 and straight_1:
+            if flush_2 and straight_2 and rank_1[4] <= rank_2[4]:
+                continue
+            p1_wins += 1
+            continue
+        if flush_2 and straight_2:
+            continue
+        #four of a kind
+        if pairs_1[0][0] == 4:
+            if pairs_2[0][0] == 4 and pairs_1[0][1] <= pairs_2[0][1]:
+                continue
+            p1_wins += 1
+            continue
+        if pairs_2[0][0] == 4:
+            continue
+        #full house
+        if len(pairs_1) == 2:
+            if len(pairs_2) == 2 and pairs_1[0][1] < pairs_2[0][1]:#cant have two three of the kind of the same rank
+                continue
+            p1_wins += 1
+            continue
+        if len(pairs_2) == 2:
+            continue
+        #print("flush")
+        #flush
+        if flush_1:#can be improved with more rank comparisons
+            if flush_2 and rank_1[4] <= rank_2[4]:
+                continue
+            p1_wins += 1
+            continue
+        if flush_2:
+            continue
+        #straight
+        if straight_1:
+            if straight_2 and rank_1[4] <= rank_2[4]:
+                continue
+            p1_wins += 1
+            continue
+        if straight_2:
+            continue
+        #three of a kind
+        if pairs_1[0][0] == 3:
+            if pairs_2[0][0] == 3:
+                bool_1 = pairs_1[0][1] < pairs_2[0][1]
+                bool_2 = pairs_1[0][1] == pairs_2[0][1] and pairs_1[1][1] < pairs_2[1][1]
+                bool_3 = pairs_1[0][1] == pairs_2[0][1] and pairs_1[1][1] == pairs_2[1][1] and pairs_1[2][1] <= pairs_2[2][1]
+                if bool_1 or bool_2 or bool_3:
+                    continue
+                p1_wins += 1
+                continue
+            else:
+                p1_wins += 1
+                continue
+        if pairs_2[0][0] == 3:
+            continue
+        #two pairs
+        if pairs_1[0][0] == 2 and pairs_1[1][0] == 2:
+            if pairs_2[0][0] == 2 and pairs_2[1][0] == 2:
+                bool_1 = pairs_1[0][1] < pairs_2[0][1]
+                bool_2 = pairs_1[0][1] == pairs_2[0][1] and pairs_1[1][1] < pairs_2[1][1]
+                bool_3 = pairs_1[0][1] == pairs_2[0][1] and pairs_1[1][1] == pairs_2[1][1] and pairs_1[2][1] <= pairs_2[2][1]
+                if bool_1 or bool_2 or bool_3:
+                    continue
+                p1_wins += 1
+                continue
+            else:
+                p1_wins += 1
+                continue
+        if pairs_2[0][0] == 2 and pairs_2[1][0] == 2:
+            continue
+        #pair
+        if pairs_1[0][0] == 2:
+            if pairs_2[0][0] == 2:
+                bool_1 = pairs_1[0][1] < pairs_2[0][1]
+                bool_2 = pairs_1[0][1] == pairs_2[0][1] and pairs_1[1][1] < pairs_2[1][1]
+                bool_3 = pairs_1[0][1] == pairs_2[0][1] and pairs_1[1][1] == pairs_2[1][1] and pairs_1[2][1] < pairs_2[2][1]
+                bool_4 = pairs_1[0][1] == pairs_2[0][1] and pairs_1[1][1] == pairs_2[1][1] and pairs_1[2][1] == pairs_2[2][1]
+                bool_4 = bool_4 and pairs_1[3][1] <= pairs_2[3][1]
+                if bool_1 or bool_2 or bool_3 or bool_4:
+                    continue
+                p1_wins += 1
+                continue
+            else:
+                p1_wins += 1
+                continue
+        if pairs_2[0][0] == 2:
+            continue
+        #high card
+        bool_0 = rank_1[4] < rank_2[4]
+        bool_1 = rank_1[4] == rank_2[4] and rank_1[3] < rank_2[3]
+        bool_2 = rank_1[4] == rank_2[4] and rank_1[3] == rank_2[3] and rank_1[2] < rank_2[2]
+        bool_3 = rank_1[4] == rank_2[4] and rank_1[3] == rank_2[3] and rank_1[2] == rank_2[2] and rank_1[1] < rank_2[1]
+        bool_4 = rank_1[4] == rank_2[4] and rank_1[3] == rank_2[3] and rank_1[2] == rank_2[2] and rank_1[1] == rank_2[1] and rank_1[0] <= rank_2[0]
+        if bool_0 or bool_1 or bool_2 or bool_3 or bool_4:
+            continue
+        else:
+            p1_wins += 1
+    return(p1_wins)
+
 def pe_55():
     def reverse_num(digits):
         n = len(digits)
@@ -1446,11 +1681,11 @@ def pe_60():
     return(int(prime_sum))
 
 if __name__ == '__main__':
-    completed = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,23,24,25,27,28,29,30,31,32,34,35,36,37,38,39,40,41,43,44,45,46,47,48,49,50,51,52,53,55,57,58,59,60]
+    completed = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,27,28,29,30,31,32,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,57,58,59,60]
     inputs = {1:(3,5,1000),2:(4000000,),3:(600851475143,),4:(),5:(20,),6:(100,),7:(10001,),8:(PE_8_STRING,),9:(1000,),10:(2000000,),11:(PE_11_STRING,),12:(500,),
-13:(PE_13_STRING,),14:(1000000,),15:(20,20),16:(1000,),17:(),18:(PE_18_STRING,),19:(),20:(100,),21:(10000,),23:(),24:(1000000,10),25:(1000,),27:(1000,1000),28:(1001,),
-29:(100,),30:(),31:([1,2,5,10,20,50,100,200],200),32:(),34:(),35:(1000000,),36:(1000000,),37:(),38:(),39:(1000,),40:(),41:(),43:(),44:(),45:(),46:(),47:(),48:(1000,),
-49:(),50:(1000000,),51:(),52:(),53:(),55:(),57:(),58:(),60:()}
+13:(PE_13_STRING,),14:(1000000,),15:(20,20),16:(1000,),17:(),18:(PE_18_STRING,),19:(),20:(100,),21:(10000,),22:(),23:(),24:(1000000,10),25:(1000,),27:(1000,1000),28:(1001,),
+29:(100,),30:(),31:([1,2,5,10,20,50,100,200],200),32:(),34:(),35:(1000000,),36:(1000000,),37:(),38:(),39:(1000,),40:(),41:(),42:(),43:(),44:(),45:(),46:(),47:(),48:(1000,),
+49:(),50:(1000000,),51:(),52:(),53:(),54:(),55:(),57:(),58:(),60:()}
     total_time = 0
     for i in completed:
         pe_func = "pe_" + str(i)
