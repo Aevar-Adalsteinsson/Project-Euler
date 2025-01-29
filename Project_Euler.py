@@ -1680,12 +1680,59 @@ def pe_60():
     prime_sum = nested_pairs(duos,duo_primes,duo_primes_ind,duo_pairs,np.array([]))
     return(int(prime_sum))
 
+def pe_61():
+    def cyclic_6(cycle,cycle_dict,num_rem,last_2):
+        m = len(num_rem)
+        if m == 0:
+            n_1 = cycle[0]
+            n_2 = cycle[len(cycle)-1]
+            if n_1//100 == n_2%100:
+                return(np.sum(cycle))
+            return(None)
+    
+        for i in np.arange(m):
+            num_type = num_rem[i]
+            k = last_2*100
+            n_cand = num_type-1 + np.sqrt(num_type**2 -2*num_type + 1 + 8*k + 8*num_type*k)
+            n_cand = n_cand/(2 + 2*num_type)
+            n_cand = int(n_cand)
+        
+            n_2 = int((n_cand+1)*((n_cand+2)/2+num_type*n_cand/2))
+        
+            if n_2//100 == last_2 and (n_2%100)//10 != 0:
+                cycle_dict[num_type] = n_2
+                cycle_2 = np.append(cycle,np.array([n_2],dtype = int))
+                num_rem_2 = np.delete(num_rem,i)
+            
+                val = cyclic_6(cycle_2,cycle_dict,num_rem_2,n_2%100)
+                if val is not None:
+                    return(val)
+        return(None)
+    
+    
+    for i in np.arange(18,58):
+        cycle = np.zeros(1,dtype = int)
+        cycle_dict = {}
+        cycle_ind = 0
+        num_type = 5
+        
+        n = int(i*((i+1)/2+num_type*(i-1)/2))
+        last_2 = n%100
+        if last_2//10 == 0:
+            continue
+        cycle[cycle_ind] = n
+        cycle_dict[cycle_ind] = num_type
+        cycle_ind = cycle_ind + 1
+        val = cyclic_6(cycle,cycle_dict,np.arange(5),last_2)
+        if val is not None:
+            return(val)
+
 if __name__ == '__main__':
-    completed = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,27,28,29,30,31,32,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,57,58,59,60]
+    completed = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,27,28,29,30,31,32,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,57,58,60]
     inputs = {1:(3,5,1000),2:(4000000,),3:(600851475143,),4:(),5:(20,),6:(100,),7:(10001,),8:(PE_8_STRING,),9:(1000,),10:(2000000,),11:(PE_11_STRING,),12:(500,),
 13:(PE_13_STRING,),14:(1000000,),15:(20,20),16:(1000,),17:(),18:(PE_18_STRING,),19:(),20:(100,),21:(10000,),22:(),23:(),24:(1000000,10),25:(1000,),27:(1000,1000),28:(1001,),
 29:(100,),30:(),31:([1,2,5,10,20,50,100,200],200),32:(),34:(),35:(1000000,),36:(1000000,),37:(),38:(),39:(1000,),40:(),41:(),42:(),43:(),44:(),45:(),46:(),47:(),48:(1000,),
-49:(),50:(1000000,),51:(),52:(),53:(),54:(),55:(),57:(),58:(),60:()}
+49:(),50:(1000000,),51:(),52:(),53:(),54:(),55:(),57:(),58:(),60:(),61:()}
     total_time = 0
     for i in completed:
         pe_func = "pe_" + str(i)
