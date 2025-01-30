@@ -199,6 +199,20 @@ def get_digits_2(n):
     digits[digit_index] = rem
     return(digits)
 
+def get_digits_3(n):
+    n_dig = int(math.log10(n))+1
+    digits = [0]*n_dig #np.zeros(n_dig)
+    rem = n%10
+    n = n//10
+    digit_index = n_dig-1
+    while n > 0:
+        digits[digit_index] = rem
+        digit_index = digit_index - 1
+        rem = n%10
+        n = n//10
+    digits[digit_index] = rem
+    return(digits)
+
 def digits_sum(digs_1,digs_2):
     #digs_1 larger than digs_2
     n = len(digs_1)
@@ -219,6 +233,27 @@ def digits_sum(digs_1,digs_2):
         digs_1[n-1-ind] = res
         ind = ind + 1
     return(digs_1)
+
+def digits_prod(digs_1,digs_2):
+    n = len(digs_1)
+    m = len(digs_2)
+    
+    prod = digs_2[m-1]
+    
+    digs_3 = [0]*n
+    carry = 0
+    for i in np.arange(n):
+        k = prod*digs_1[n-1-i]
+        k = k+carry
+        digs_3[n-1-i] = k%10
+        carry = k//10
+    if carry > 0:
+        digs_3 = [carry] + digs_3 
+    if m == 1:
+        return(digs_3)
+    digs = digs_1 + [0] 
+    digs = digits_prod(digs, digs_2[0:(m-1)])
+    return(digits_sum(digs,digs_3))
 
 def bin_search_check(x,cand,i,j):
     if j-i == 1:

@@ -1727,12 +1727,67 @@ def pe_61():
         if val is not None:
             return(val)
 
+def pe_62():
+    def get_dig_occ(digits):
+        #number of digit occurrences
+        dig_occ = [0]*10
+        n = len(digits)
+        for i in np.arange(n):
+            dig = digits[i]
+            dig_occ[dig] = dig_occ[dig] + 1
+        return(dig_occ)
+    min_cube = math.inf
+    for i in np.arange(3,20):
+        flag = False
+        digits = [0]*(i+1)
+        
+        low = int(10**(i/3))+1
+        high = int(10**((i+1)/3))
+    
+    
+        dig_occ = []
+        for j in np.arange(low,high+1):
+            digits = pehelperfunctions.get_digits_3(j)
+            digits = pehelperfunctions.digits_prod(pehelperfunctions.digits_prod(digits,digits),digits)
+            dig_occ.append(get_dig_occ(digits))
+        dig_occ.sort()
+        prev = dig_occ[0]
+        cub_per_n = 1
+        for j in np.arange(1,len(dig_occ)):
+            curr = dig_occ[j]
+            if prev == curr:
+                cub_per_n = cub_per_n + 1
+            else:
+                cub_per_n = 1
+            prev = curr
+            if cub_per_n > 3:
+                if cub_per_n == 5:
+                    flag = True
+                    for k in np.arange(low,high+1):
+                        digits = pehelperfunctions.get_digits_3(k)
+                        digits = pehelperfunctions.digits_prod(pehelperfunctions.digits_prod(digits,digits),digits)
+                        occ = get_dig_occ(digits)
+                        if occ == curr:
+                            if k < min_cube:
+                                min_cube = k
+        if flag:
+            break
+    return(int(min_cube)**3)
+
+def pe_63():
+    count = 0
+    for i in np.arange(1,10):
+        t = 1/(1-math.log10(i))
+        count = count + int(t)
+    return(count)
+
 if __name__ == '__main__':
-    completed = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,27,28,29,30,31,32,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,57,58,60]
+    completed = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,27,28,29,30,31,32,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,57,58,60,61
+,62,63]
     inputs = {1:(3,5,1000),2:(4000000,),3:(600851475143,),4:(),5:(20,),6:(100,),7:(10001,),8:(PE_8_STRING,),9:(1000,),10:(2000000,),11:(PE_11_STRING,),12:(500,),
 13:(PE_13_STRING,),14:(1000000,),15:(20,20),16:(1000,),17:(),18:(PE_18_STRING,),19:(),20:(100,),21:(10000,),22:(),23:(),24:(1000000,10),25:(1000,),27:(1000,1000),28:(1001,),
 29:(100,),30:(),31:([1,2,5,10,20,50,100,200],200),32:(),34:(),35:(1000000,),36:(1000000,),37:(),38:(),39:(1000,),40:(),41:(),42:(),43:(),44:(),45:(),46:(),47:(),48:(1000,),
-49:(),50:(1000000,),51:(),52:(),53:(),54:(),55:(),57:(),58:(),60:(),61:()}
+49:(),50:(1000000,),51:(),52:(),53:(),54:(),55:(),57:(),58:(),60:(),61:(),62:(),63:()}
     total_time = 0
     for i in completed:
         pe_func = "pe_" + str(i)
