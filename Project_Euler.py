@@ -834,14 +834,42 @@ def pe_32():
     return(np.sum(pan_prods))
 
 def pe_34():
+    fact = [math.factorial(x) for x in range(10)]
+    max_8 = fact[8]*6 #8!*6 has 6 digits and 8!*7 has 6 digits
     fact_digit_sum = 0
-    digits = np.zeros(7,dtype = int)
-    for i in range(10,2540160):
-        i_digs,i_index = pehelperfunctions.get_digits(digits,i)
-        vfunc = np.vectorize(math.factorial)
-        fact_sum = np.sum(vfunc(i_digs[:i_index]))
-        if i == fact_sum:
-            fact_digit_sum = fact_digit_sum + i
+    i = 10
+    while i < 2540160:# for i in range(10,2540160):
+        digits = []
+        max_digit = 0
+        i_1 = i
+        n_9 = 0
+        while i_1 > 0:
+            digit = i_1%10
+            if digit > max_digit:
+                max_digit = digit
+            if digit == 9:
+                n_9 += 1
+            digits.append(digit)
+            i_1 = i_1//10
+        if max_digit == 9:
+            if i < fact[9]:
+                i = i+1
+                continue
+            if i > n_9*fact[9] + (7-n_9)*fact[8]:#i needs to have more digits that are 9
+                pow_10 = 1
+                while i%(10**pow_10) == 9:
+                    pow_10 += 1
+                i = i - i%(10**pow_10) + 10**pow_10 - 1
+        else:
+            if i > max_8:
+                i = i - i%10+9#
+                continue
+        fact_sum = 0
+        for j in digits:
+            fact_sum += fact[j]
+        if fact_sum == i:
+            fact_digit_sum += i
+        i = i+1
     return(fact_digit_sum)
 
 def pe_35(n):
@@ -1789,6 +1817,8 @@ if __name__ == '__main__':
 29:(100,),30:(),31:([1,2,5,10,20,50,100,200],200),32:(),34:(),35:(1000000,),36:(1000000,),37:(),38:(),39:(1000,),40:(),41:(),42:(),43:(),44:(),45:(),46:(),47:(),48:(1000,),
 49:(),50:(1000000,),51:(),52:(),53:(),54:(),55:(),57:(),58:(),60:(),61:(),62:(),63:()}
     total_time = 0
+    highest_time = 0
+    highest_problem = 0
     for i in completed:
         pe_func = "pe_" + str(i)
         args = inputs[i]
@@ -1798,8 +1828,12 @@ if __name__ == '__main__':
         res = x(*args)
         end = timeit.default_timer()
         total_time = total_time + end-start
+        if end-start > highest_time:
+            highest_time = end-start
+            highest_problem = i
         print("Problem: " + str(i))
         print("Result: " + str(res))
         print("Time: " + str(end-start))
     print("Total Time: " + str(total_time))
     print("Average Time: " + str(total_time/len(completed)))
+    print("Longest Problem was Problem " + str(highest_problem) + " which took " + str(highest_time))
