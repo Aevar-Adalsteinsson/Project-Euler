@@ -1809,13 +1809,68 @@ def pe_63():
         count = count + int(t)
     return(count)
 
+def pe_64():
+    odd_p = 0
+    for i in np.arange(2,10001):
+        count = 0
+        a = i
+        b = int(np.sqrt(a))
+        c = np.sqrt(a)
+        if b == c:
+            continue
+        
+        per = []
+        nom = [0,1]
+        denom = [1,-b]
+        
+        initial = []
+        while True:
+            init = (nom[1],denom[0],denom[1])
+            if init in initial:
+                if len(per)%2 == 1:
+                    odd_p = odd_p + 1
+                break
+            else:
+                initial = initial + [init]
+            count = count + 1
+            
+
+
+            temp = nom.copy()
+            nom[0] = denom[0]*temp[1]
+            nom[1] = (-denom[1])*temp[1]
+
+            denom[0] = 0
+            denom[1] = a-denom[1]*denom[1]
+
+            div = pehelperfunctions.gcd(np.abs(nom[0]),np.abs(nom[1]))
+            div = pehelperfunctions.gcd(div,np.abs(nom[1]))
+
+            nom = [x/div for x in nom]
+            denom = [x/div for x in denom]
+
+            whole = (nom[0]*c + nom[1])//denom[1]
+            nom[1] = nom[1] - whole*denom[1]
+            
+            
+            
+            temp = nom
+            nom = denom
+            denom = temp
+            
+            per = per + [whole]
+    print(odd_p)
+
+
+
+
 if __name__ == '__main__':
     completed = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,27,28,29,30,31,32,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,57,58,60,61
-,62,63]
+,62,63,64]
     inputs = {1:(3,5,1000),2:(4000000,),3:(600851475143,),4:(),5:(20,),6:(100,),7:(10001,),8:(PE_8_STRING,),9:(1000,),10:(2000000,),11:(PE_11_STRING,),12:(500,),
 13:(PE_13_STRING,),14:(1000000,),15:(20,20),16:(1000,),17:(),18:(PE_18_STRING,),19:(),20:(100,),21:(10000,),22:(),23:(),24:(1000000,10),25:(1000,),27:(1000,1000),28:(1001,),
 29:(100,),30:(),31:([1,2,5,10,20,50,100,200],200),32:(),34:(),35:(1000000,),36:(1000000,),37:(),38:(),39:(1000,),40:(),41:(),42:(),43:(),44:(),45:(),46:(),47:(),48:(1000,),
-49:(),50:(1000000,),51:(),52:(),53:(),54:(),55:(),57:(),58:(),60:(),61:(),62:(),63:()}
+49:(),50:(1000000,),51:(),52:(),53:(),54:(),55:(),57:(),58:(),60:(),61:(),62:(),63:(),64:()}
     total_time = 0
     highest_time = 0
     highest_problem = 0

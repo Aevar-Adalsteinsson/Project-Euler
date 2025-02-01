@@ -318,4 +318,23 @@ def next_pandigital(digits,n):
     digits = np.append(digits[:(index+1)],prev_digits)
     return(digits)
 
-
+def gcd(n,m):
+    if n == m:
+        return(n)
+    if m>n:
+        temp = n
+        n = m
+        m = temp
+    if n%m == 0:
+        return(m)
+    p_upp = int(np.sqrt(m))+1
+    primes = gen_primes(p_upp)
+    div = 1
+    for p in primes:
+        while m%p == 0 and n%p == 0:
+            div = div*p
+            m = m//p
+            n = n//p
+        if n <= 1 or m <= 1:
+            return(div)
+    return(div)
