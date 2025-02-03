@@ -1893,14 +1893,97 @@ def pe_65(n):
         nom = nom//10
     return(digit_sum)
 
+def pe_66(n):
+    def per_sqrt(nom,denom,n,root_n):
+        temp = nom.copy()
+        nom[0] = denom[0]*temp[1]
+        nom[1] = (-denom[1])*temp[1]
+
+        denom[0] = 0
+        denom[1] = n-denom[1]*denom[1]
+
+        div = pehelperfunctions.gcd(np.abs(nom[0]),np.abs(nom[1]))
+        div = pehelperfunctions.gcd(div,np.abs(nom[1]))
+
+        nom = [x/div for x in nom]
+        denom = [x/div for x in denom]
+
+        whole = int((nom[0]*root_n + nom[1])//denom[1])
+        nom[1] = nom[1] - whole*denom[1]
+
+        temp = nom
+        nom = denom
+        denom = temp
+        return((nom,denom,whole))
+    def rat_approx(plus_term,periods):
+        n = len(periods)
+        nom = 1
+        denom = periods[n-1]
+        inter = (nom,denom)
+        for i in range(n-2,-1,-1):
+            denom = inter[1]
+            nom = periods[i]*denom + inter[0]
+    
+            temp = denom
+            denom = nom
+            nom = temp
+    
+            inter = (nom,denom)
+        nom = nom + plus_term*denom
+        return((nom,denom))
+    
+    max_dio = 0
+    for D in range(8,n+1):
+        D_sqrt = int(np.sqrt(D))
+        if D_sqrt**2 == D:
+            continue
+        nom = [0,1]
+        denom = [1,-D_sqrt]
+        periods = []
+        while True:
+            nom,denom,whole = per_sqrt(nom,denom,D,np.sqrt(D))#numerator and denom for producing periodic continuing fractions
+            periods.append(whole)
+            nom_2 ,denom_2 = rat_approx(D_sqrt,periods)#rational approximation of square root of D using continuing fractions
+            
+            x_2 = nom_2*nom_2
+            Dy_2 = D*denom_2*denom_2
+            if x_2-Dy_2 == 1:
+                if nom_2 > max_dio:
+                    max_dio = nom_2
+                break
+    return(max_dio)
+
+def pe_67():
+    def process_67():
+        f = open("pe_67_triangle.txt", "r")
+        pyramid = f.read()
+        pyramid = pyramid.split('\n')
+
+        n = len(pyramid)
+        pyramid = pyramid[:(n-1)]
+        n = n-1
+        triangle = []
+        for i in range(len(pyramid)):
+            tri = pyramid[i].split(" ")
+            triangle.append([int(x) for x in tri])
+        return(triangle)
+    
+    triangle = process_67()
+    
+    n = len(triangle)
+    for i in range(n-2,-1,-1):
+        m = len(triangle[i])
+        for j in range(m):
+            triangle[i][j] += max(triangle[i+1][j],triangle[i+1][j+1])
+    return(triangle[0][0])
 
 if __name__ == '__main__':
     completed = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,27,28,29,30,31,32,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,57,58,60,61
-,62,63,64,65]
+,62,63,64,65,66,67]
     inputs = {1:(3,5,1000),2:(4000000,),3:(600851475143,),4:(),5:(20,),6:(100,),7:(10001,),8:(PE_8_STRING,),9:(1000,),10:(2000000,),11:(PE_11_STRING,),12:(500,),
 13:(PE_13_STRING,),14:(1000000,),15:(20,20),16:(1000,),17:(),18:(PE_18_STRING,),19:(),20:(100,),21:(10000,),22:(),23:(),24:(1000000,10),25:(1000,),27:(1000,1000),28:(1001,),
 29:(100,),30:(),31:([1,2,5,10,20,50,100,200],200),32:(),34:(),35:(1000000,),36:(1000000,),37:(),38:(),39:(1000,),40:(),41:(),42:(),43:(),44:(),45:(),46:(),47:(),48:(1000,),
-49:(),50:(1000000,),51:(),52:(),53:(),54:(),55:(),57:(),58:(),60:(),61:(),62:(),63:(),64:(),65:(100,)}
+49:(),50:(1000000,),51:(),52:(),53:(),54:(),55:(),57:(),58:(),60:(),61:(),62:(),63:(),64:(),65:(100,),66:(1000,),67:()}
     total_time = 0
     highest_time = 0
     highest_problem = 0
