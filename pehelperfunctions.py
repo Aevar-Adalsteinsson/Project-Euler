@@ -338,3 +338,35 @@ def gcd(n,m):
         if n <= 1 or m <= 1:
             return(div)
     return(div)
+
+def totient(prime_div,n):
+    def nested_loop(primes,prime_prod,k,pm,val,n):
+        if prime_prod >= n:
+            return(val)
+        if primes == []:
+            return(val)
+        if k == 1:
+            val_sum = 0
+            for i in range(len(primes)):
+                p = primes[i]
+                val_sum += pm*(n//(prime_prod*p)-1)
+            return(val + val_sum)
+        
+        old_val = val
+        for p in primes:
+            new_primes = [x for x in primes if x > p]
+            new_val = nested_loop(new_primes,prime_prod*p,k-1,-1*pm,old_val,n)
+            #if k == 2:
+            #    print((p,prime_prod,new_val))
+            if new_val == old_val:#only if prime_prod*p >= n, primes is sorted so every next prime_prod*p_new >= n
+                break
+            old_val = new_val
+        return(old_val)
+    totient = 1
+    for i in range(len(prime_div)):
+        val = nested_loop(prime_div,1,i+1,1,0,n)
+        ##print(val)
+        if val == 0:
+            break
+        totient += val
+    return(n-totient)
