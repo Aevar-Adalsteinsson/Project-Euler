@@ -75,6 +75,21 @@ def get_prime_divisor_n(n,primes):
                 return(prime_div_n)
     return(prime_div_n)
 
+def get_prime_divisor_simple(n,primes):
+    #returns list of all of the prime divisors of n
+    m = len(primes)
+    div = []
+    if n == 1:
+        return([])
+    for prime in primes:
+        if n%prime == 0:
+            div.append(prime)
+            while n%prime == 0:
+                n = n/prime
+            if n == 1:
+                return(div)
+    return(div)
+
 def gen_additional_primes(n,primes,primes_ind):
     #primes must contain 2 and 3
     #primes contains all primes less than some k < n

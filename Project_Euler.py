@@ -1996,13 +1996,47 @@ def pe_69(n):
         prime_div.append(p)
     return(max_tot_n)
 
+def pe_71(d):
+    primes = pehelperfunctions.gen_primes(d)
+    val = d//7
+    upper = 3*val
+    for i in range(upper,0,-1):
+        if np.gcd(i,7*val) == 1:
+            closest = 3/7-i/(7*val)#good candidate
+            closest_nd = (i,7*val)
+            break
+
+    for i in range(2,d+1):
+        if i == 7:
+            continue
+        
+        upper = i*3//7 
+        if 3/7-upper/i > closest:
+            continue
+        i_div = pehelperfunctions.get_prime_divisor_simple(i,primes)
+        for j in range(upper,0,-1):
+            diff = 3/7-j/i
+            if diff > closest:
+                break
+            is_coprime = True
+            for prime in i_div:
+                if j%prime == 0:
+                    is_coprime = False
+                    break
+            if is_coprime:
+                if diff < closest:
+                    closest = diff
+                    closest_nd = (j,i)
+                break
+    return(closest_nd[0])
+
 if __name__ == '__main__':
     completed = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,27,28,29,30,31,32,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,57,58,60,61
-,62,63,64,65,66,67,69]
+,62,63,64,65,66,67,69,71]
     inputs = {1:(3,5,1000),2:(4000000,),3:(600851475143,),4:(),5:(20,),6:(100,),7:(10001,),8:(PE_8_STRING,),9:(1000,),10:(2000000,),11:(PE_11_STRING,),12:(500,),
 13:(PE_13_STRING,),14:(1000000,),15:(20,20),16:(1000,),17:(),18:(PE_18_STRING,),19:(),20:(100,),21:(10000,),22:(),23:(),24:(1000000,10),25:(1000,),27:(1000,1000),28:(1001,),
 29:(100,),30:(),31:([1,2,5,10,20,50,100,200],200),32:(),34:(),35:(1000000,),36:(1000000,),37:(),38:(),39:(1000,),40:(),41:(),42:(),43:(),44:(),45:(),46:(),47:(),48:(1000,),
-49:(),50:(1000000,),51:(),52:(),53:(),54:(),55:(),57:(),58:(),60:(),61:(),62:(),63:(),64:(),65:(100,),66:(1000,),67:(),69:(1000000,)}
+49:(),50:(1000000,),51:(),52:(),53:(),54:(),55:(),57:(),58:(),60:(),61:(),62:(),63:(),64:(),65:(100,),66:(1000,),67:(),69:(1000000,),71:(1000000,)}
     total_time = 0
     highest_time = 0
     highest_problem = 0
