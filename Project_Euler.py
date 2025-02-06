@@ -2030,13 +2030,51 @@ def pe_71(d):
                 break
     return(closest_nd[0])
 
+def pe_72(d):
+    #need nested loop because we overcount non reduce proper fraction by simply going through the primes
+    #example: we overcount 6/30 since 2 and 3 is both factors of 6
+    def nested_loop(prime_m,primes,factors,n):
+        if len(factors)>0:
+            prime_m.append(factors)
+        if len(primes) == 0 or n < primes[0]:
+            return(prime_m)
+        
+        for i in range(len(primes)):
+            p = primes[i]
+            k = n//int(p)-1
+            #if len(factors) == 0:
+            #    k = k-1
+            if k == 0:
+                break
+            new_factors = [x for x in factors]
+            new_factors.append(p)
+            prime_m = nested_loop(prime_m,primes[(i+1):],new_factors,n//p)
+        return(prime_m)
+    
+    all_frac = (d-1)*d//2
+    primes = pehelperfunctions.gen_primes(d//2 + 1)
+    non_red = 0
+    
+    prime_m = nested_loop([],primes,[],d)
+    for i in range(len(prime_m)):
+        prime_factors = prime_m[i]
+        num = math.prod(prime_factors)
+        if len(prime_factors)%2 == 1:
+            pm = 1
+        else:
+            pm = -1
+        k = d//int(num)-1          #numbers n <= d that satisfy gcd(n,num) = num^s for some s > 0 excluding p itself
+        non_red += pm*k*(k+1)//2   #each multiple of p, say np, has n-1 non reduced fraction because of p 
+
+    return(all_frac-non_red)
+
 if __name__ == '__main__':
     completed = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,27,28,29,30,31,32,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,57,58,60,61
-,62,63,64,65,66,67,69,71]
+,62,63,64,65,66,67,69,71,72]
     inputs = {1:(3,5,1000),2:(4000000,),3:(600851475143,),4:(),5:(20,),6:(100,),7:(10001,),8:(PE_8_STRING,),9:(1000,),10:(2000000,),11:(PE_11_STRING,),12:(500,),
 13:(PE_13_STRING,),14:(1000000,),15:(20,20),16:(1000,),17:(),18:(PE_18_STRING,),19:(),20:(100,),21:(10000,),22:(),23:(),24:(1000000,10),25:(1000,),27:(1000,1000),28:(1001,),
 29:(100,),30:(),31:([1,2,5,10,20,50,100,200],200),32:(),34:(),35:(1000000,),36:(1000000,),37:(),38:(),39:(1000,),40:(),41:(),42:(),43:(),44:(),45:(),46:(),47:(),48:(1000,),
-49:(),50:(1000000,),51:(),52:(),53:(),54:(),55:(),57:(),58:(),60:(),61:(),62:(),63:(),64:(),65:(100,),66:(1000,),67:(),69:(1000000,),71:(1000000,)}
+49:(),50:(1000000,),51:(),52:(),53:(),54:(),55:(),57:(),58:(),60:(),61:(),62:(),63:(),64:(),65:(100,),66:(1000,),67:(),69:(1000000,),71:(1000000,),72:(10**6,)}
     total_time = 0
     highest_time = 0
     highest_problem = 0
