@@ -48,7 +48,7 @@ def gen_primes(n):
 def get_prime_divisors(n,primes,primes_ind):
     #get prime divisors of n 
     #returns list of prime divisor multiplicity of primes up to n 
-    #e.g n = 2^k*3^r gives [k,3,0,...,0]
+    #e.g n = 2^k*3^r gives [k,r,0,...,0]
     m = len(primes)
     if n == 1:
         return(np.zeros(m))
@@ -58,6 +58,23 @@ def get_prime_divisors(n,primes,primes_ind):
             n = n/prime
             index = primes_ind[prime]
             divisors[index] = divisors[index] + 1
+    return(divisors)
+
+def get_prime_divisors_2(n,primes):
+    #get prime divisors of n 
+    m = len(primes)
+    if n == 1:
+        return([])
+    divisors = []
+    for prime in primes:
+        prime_n = 0
+        while n%prime == 0:
+            n = n//prime
+            prime_n += 1
+        if prime_n > 0:
+            divisors.append((prime,prime_n))
+        if n == 1:
+            return(divisors)
     return(divisors)
 
 def get_prime_divisor_n(n,primes):
