@@ -2149,14 +2149,44 @@ def pe_74(n):
             digit_fact[chain_j] = val
     return(term_60)
 
+def pe_75(L):
+    def gen_pyth_prim(L):
+        #generates all pythagorean primitive triples such that a+b+c <= L
+        #returns list of tuples (a+b+c,a,b,c)
+        #uses Euclid's formula https://en.wikipedia.org/wiki/Pythagorean_triple#Generating_a_triple
+        n = int(np.sqrt(L)/2)+1
+        prim = []
+        for i in range(1,n):#i=n
+            i_2 = i*i
+            low = i+1
+            #print((i,i_2,L))
+            high = int((-i + np.sqrt(i_2+2*L))//2)+1
+            for j in range(low,high,2):#j=m triples are primitive if i and j are coprime and exactly one is even
+                if np.gcd(i,j) == 1:
+                    j_2 = j*j
+                    prim.append((2*j_2+2*j*i,j_2-i_2,2*i*j,i_2+j_2))
+        return(prim)
+    
+    prim = gen_pyth_prim(L)
+
+    pyth = np.zeros(L+1)
+    for p in prim:
+        length = p[0]
+        ind = np.arange(1,L//length+1)*length
+        pyth[ind] += 1
+    single_tri_n = np.count_nonzero(pyth == 1)
+    
+    
+    return(single_tri_n)
+
 if __name__ == '__main__':
     completed = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,27,28,29,30,31,32,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,57,58,60,61
-,62,63,64,65,66,67,69,71,72,73,74]
+,62,63,64,65,66,67,69,71,72,73,74,75]
     inputs = {1:(3,5,1000),2:(4000000,),3:(600851475143,),4:(),5:(20,),6:(100,),7:(10001,),8:(PE_8_STRING,),9:(1000,),10:(2000000,),11:(PE_11_STRING,),12:(500,),
 13:(PE_13_STRING,),14:(1000000,),15:(20,20),16:(1000,),17:(),18:(PE_18_STRING,),19:(),20:(100,),21:(10000,),22:(),23:(),24:(1000000,10),25:(1000,),27:(1000,1000),28:(1001,),
 29:(100,),30:(),31:([1,2,5,10,20,50,100,200],200),32:(),34:(),35:(1000000,),36:(1000000,),37:(),38:(),39:(1000,),40:(),41:(),42:(),43:(),44:(),45:(),46:(),47:(),48:(1000,),
 49:(),50:(1000000,),51:(),52:(),53:(),54:(),55:(),57:(),58:(),60:(),61:(),62:(),63:(),64:(),65:(100,),66:(1000,),67:(),69:(1000000,),71:(1000000,),72:(10**6,),
-73:(12000,),74:(10**6,)}
+73:(12000,),74:(10**6,),75:(1500000,)}
     total_time = 0
     highest_time = 0
     highest_problem = 0
