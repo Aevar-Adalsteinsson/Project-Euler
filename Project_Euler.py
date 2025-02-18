@@ -2179,14 +2179,72 @@ def pe_75(L):
     
     return(single_tri_n)
 
+def pe_76(n):
+    prev_part = [[0],[0,1,0],[0,0,0]]#element 0,i is only referenced for i = 0
+    i = 2
+    while True:
+        for j in range(i,1,-1):
+            i_j = 0
+            for k in range(1,j+1):
+                i_j += prev_part[i-k][min(i-k,k)]
+            prev_part[i][j] = i_j
+        prev_part[i][1] = 1
+        
+        if i > n:
+            break
+        i = i+1
+        
+        for j in range(1,i):
+            prev_part[j].append(0)
+        new_list = [0]*(i+1)
+        prev_part.append(new_list)
+    return(prev_part[i][i]-1)
+
+def pe_77(n):
+    primes = pehelperfunctions.gen_primes(10000)
+    prev_part = [[0,0,1],[0,0,0],[0,0,0]] #prev_par[i][j] is how many sums of primes less or equal to primes[i] sum up to j
+    i = 3
+    while True:
+        for j in range(len(prev_part)):
+            prev_part[j].append(0)
+        if primes[len(prev_part)] <= i:
+            new_list = [0]*(i+1)
+            prev_part.append(new_list)
+        
+        if i%2 == 0:
+            prev_part[0][i] = 1
+        for j in range(1,i+1):
+            p_j = primes[j]
+            if p_j >= i:
+                if p_j == i:
+                    prev_part[j][i] = prev_part[j-1][i] + 1
+                break
+            i_j = 0
+            for k in range(j+1):
+                p_k = primes[k]
+                if i-p_k < primes[k] and i-p_k >=2:
+                    l = k-1
+                    p_l = primes[l]
+                    while i-p_k < p_l:
+                        l = l-1
+                        p_l = primes[l]
+                    
+                    i_j += prev_part[l][i-p_k]
+                else:
+                    i_j += prev_part[k][i-p_k]
+            prev_part[j][i] = i_j
+        if prev_part[len(prev_part)-1][i] >= n:
+            return(i)
+        i = i+1
+
 if __name__ == '__main__':
     completed = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,27,28,29,30,31,32,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,57,58,60,61
-,62,63,64,65,66,67,69,71,72,73,74,75]
+,62,63,64,65,66,67,69,71,72,73,74,75,76,77]
     inputs = {1:(3,5,1000),2:(4000000,),3:(600851475143,),4:(),5:(20,),6:(100,),7:(10001,),8:(PE_8_STRING,),9:(1000,),10:(2000000,),11:(PE_11_STRING,),12:(500,),
 13:(PE_13_STRING,),14:(1000000,),15:(20,20),16:(1000,),17:(),18:(PE_18_STRING,),19:(),20:(100,),21:(10000,),22:(),23:(),24:(1000000,10),25:(1000,),27:(1000,1000),28:(1001,),
 29:(100,),30:(),31:([1,2,5,10,20,50,100,200],200),32:(),34:(),35:(1000000,),36:(1000000,),37:(),38:(),39:(1000,),40:(),41:(),42:(),43:(),44:(),45:(),46:(),47:(),48:(1000,),
 49:(),50:(1000000,),51:(),52:(),53:(),54:(),55:(),57:(),58:(),60:(),61:(),62:(),63:(),64:(),65:(100,),66:(1000,),67:(),69:(1000000,),71:(1000000,),72:(10**6,),
-73:(12000,),74:(10**6,),75:(1500000,)}
+73:(12000,),74:(10**6,),75:(1500000,),76:(100,),77:(5000,)}
     total_time = 0
     highest_time = 0
     highest_problem = 0
